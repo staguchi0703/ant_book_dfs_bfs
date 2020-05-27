@@ -1,20 +1,76 @@
-# at_coder_template
-## 目的
-VScodeでat_coderのABCに参加するための準備
+# 蟻本2-1の中からDFSBFS
 
-## 使い方
-1. github上で`templete`をクローンしたリポジトリを作成し、参加コンテストの名前を付ける。
-   * レポジトリを新規作成する画面に遷移した際に、他のリポジトリを取り込むリンクがあるので、そこから作成すると早い。 
-2. ローカルに複製する。　`git clone {repo}`
-   * 複製するとローカルリポジトリのディレクトリに自動で飛ぶ。
-   * そこで`code .`すれば、そのまま今回のコンテストに必要なディレクトリだけを持ったworkingspaceが立ち上がる。
-3. テストケースの値を各問題フォルダの`input.txt`にペースト
-4. 回答をa_main.pyに記入
-5. 実行して動作確認する。terminalからのpython実行をキーバインドするのが〇
-6. `output.txt`に期待する出力をいれて、`resolve.py`に提出するコードを入力しておけば、`test_resolve_form_input_files.py`でunittestが実行できる。
-7. chrome pluginのAtcoder_unittestの内容を`test_pasted_from_page.py`にペーストすれば、全ての出力例の確認ができる。
+## 参考
+
+* `https://qiita.com/drken/items/e77685614f3c6bf86f44`
+
+* 上記に示される例題を解いた
+
+## DFS
+
+### DFS典型コード
 
 
-## その他
-* 画面スペースに余裕があれば、`resolve.py`と`test_pasted_from_page.py`と`terminal`の3画面で作業した方が速いかも。
-* 途中の確認をprintでバグするなら`a_main.py`でいじる方が分かりやすい。
+* numpy.whereとか使いたくなるが、激重なので使用NG
+* collection.queとlistのスライスで攻めるのが◎
+
+```python dfs.py
+
+import collections
+H, W = [int(item) for item in input().split()]
+grid = [[item for item in input()] for _ in range(H)]
+
+stack = collections.deque()
+fp = [[0 for _ in range(W)] for _ in range(H)]
+
+# --------開始条件探索----------
+start = False
+for i in range(H):
+    for j in range(W):
+        if grid[i][j] == 's':
+            start = [i, j] 
+            break
+    if start:
+        break
+#------------------------------
+
+stack.append(start)
+is_found = False
+
+fp[start[0]][start[1]] = 1
+goto = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+
+
+while stack:
+    temp = stack.pop()
+    y, x = temp
+    # print(x,y)
+    # print(grid[y][x])
+
+    if grid[y][x] == 'g':
+        is_found = True
+        stack = False
+        # 探索終了条件
+    elif grid[y][x] == '#':
+        pass
+        #障害物
+    else:
+        for i in range(4):
+            nx = x + goto[i][0]
+            ny = y + goto[i][1]
+
+            if 0 <= nx <= W-1 and 0 <= ny <= H-1:
+                if fp[ny][nx] == 0:
+                    stack.append([ny, nx])
+                    fp[ny][nx] = fp[y][x] + 1
+                    # print('next', nx, ny)
+
+print('Yes') if is_found else print('No')
+
+    
+```
+
+
+
+### [ATC 001 A 深さ優先探索](https://atcoder.jp/contests/atc001/tasks/dfs_a)
+
