@@ -14,7 +14,7 @@
 * numpy.whereとか使いたくなるが、激重なので使用NG
 * collection.queとlistのスライスで攻めるのが◎
 
-```python dfs.py
+```python
 
 import collections
 H, W = [int(item) for item in input().split()]
@@ -286,3 +286,100 @@ if __name__ == "__main__":
 
 ```
 
+## BFS
+
+### BFSの典型コード
+
+
+### [ABC007 幅優先探索](https://atcoder.jp/contests/abc007/)
+
+#### 方針
+
+* 典型的なBFS
+
+#### 実装
+
+* 使いまわせるように工夫した
+* 足跡を記録するfp配列
+  * -1で初期化
+  * 開始地点を0で初期化
+  * que追加の際に足跡を記録
+* 行先を`d_y_x_list`として登録することで、他の方向で動いても対応可
+* 入れる値受ける値を配列のスライス順に合わせてy,xの順序で処理してた
+* 次の番手目が分かるようにqueに次の番手目を加えた
+* 次の番手目が枠をはみ出しているか判定するために、`ny, nx`を計算し、if文で絞り込みをかけた 
+
+
+### [JOI2010 E](https://atcoder.jp/contests/joi2011yo/tasks/joi2011yo_e)
+
+### 方針
+
+* 繰り返し計算するので、始点・終点探しと探索を関数化した。
+
+### 実装
+
+ * 工夫はない
+
+```python
+def resolve():
+    '''
+    code here
+    '''
+    import collections
+    H, W , N = [int(item) for item in input().split()]
+    grid = [[item for item in input()] for _ in range(H)]
+
+    def find_pos(S):
+        is_found = False
+        for i in range(H):
+            for j in range(W):
+                if S == 0:
+                    if grid[i][j] == 'S':
+                        sy = i
+                        sx = j
+                        is_found = True
+                        return sy, sx
+                else:
+                    if grid[i][j] == str(S):
+                        sy = i
+                        sx = j
+                        is_found = True
+                        return sy, sx
+
+
+    def path_num(start, goal):
+        sy, sx = find_pos(start)
+        gy, gx = find_pos(goal)
+        que = collections.deque([[sy, sx, 0]])
+        fp = [[-1 for _ in range(W)] for _ in range(H)]
+        d_y_x_list = [[1, 0], [0, 1], [-1, 0,], [0, -1]]
+
+        while que:
+            y, x, cnt = que.popleft()
+
+            if y == gy and x == gx:
+                return cnt
+
+            else:
+                for dy, dx in d_y_x_list:
+                    ny = y + dy
+                    nx = x + dx
+
+                    if 0 <= ny <= H-1 and 0 <= nx <= W-1:
+                        if grid[ny][nx] != "X" and fp[ny][nx] == -1:
+                            que.append([ny, nx, cnt + 1])
+                            fp[ny][nx] = cnt + 1
+                            # print(ny, nx, cnt + 1)
+        
+
+    res = 0
+    for num in range(N):
+        res += path_num(num, num+1)
+
+    print(res)
+
+
+if __name__ == "__main__":
+    resolve()
+
+```
