@@ -69,61 +69,56 @@ print('Yes') if is_found else print('No')
 
 ``` python atc001a.py
 
-def resolve():
-    '''
-    code here
-    '''
-    import collections
-    H, W = [int(item) for item in input().split()]
-    grid = [[item for item in input()] for _ in range(H)]
+import collections
+H, W = [int(item) for item in input().split()]
+grid = [[item for item in input()] for _ in range(H)]
 
-    stack = collections.deque()
-    fp = [[0 for _ in range(W)] for _ in range(H)]
+stack = collections.deque()
+fp = [[0 for _ in range(W)] for _ in range(H)]
 
-    start = False
-    for i in range(H):
-        for j in range(W):
-            if grid[i][j] == 's':
-                start = [i, j]
-                break
-        if start:
+start = False
+for i in range(H):
+    for j in range(W):
+        if grid[i][j] == 's':
+            start = [i, j]
             break
+    if start:
+        break
 
 
-    stack.append(start)
-    is_found = False
+stack.append(start)
+is_found = False
 
-    fp[start[0]][start[1]] = 1
-    goto = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+fp[start[0]][start[1]] = 1
+goto = [[1, 0], [0, 1], [-1, 0], [0, -1]]
 
 
-    while stack:
-        temp = stack.pop()
-        y, x = temp
-        # print(x,y)
-        # print(grid[y][x])
+while stack:
+    temp = stack.pop()
+    y, x = temp
+    # print(x,y)
+    # print(grid[y][x])
 
-        if grid[y][x] == 'g':
-            is_found = True
-            stack = False
-        elif grid[y][x] == '#':
-            pass
-        else:
-            for i in range(4):
-                nx = x + goto[i][0]
-                ny = y + goto[i][1]
+    if grid[y][x] == 'g':
+        is_found = True
+        stack = False
+    elif grid[y][x] == '#':
+        pass
+    else:
+        for i in range(4):
+            nx = x + goto[i][0]
+            ny = y + goto[i][1]
 
-                if 0 <= nx <= W-1 and 0 <= ny <= H-1:
-                    if fp[ny][nx] == 0:
-                        stack.append([ny, nx])
-                        #.pop()中身が[y,x]だからここも揃える
-                        fp[ny][nx] = fp[y][x] + 1
-                        # print('next', nx, ny)
+            if 0 <= nx <= W-1 and 0 <= ny <= H-1:
+                if fp[ny][nx] == 0:
+                    stack.append([ny, nx])
+                    #.pop()中身が[y,x]だからここも揃える
+                    fp[ny][nx] = fp[y][x] + 1
+                    # print('next', nx, ny)
 
-    print('Yes') if is_found else print('No')
+print('Yes') if is_found else print('No')
 
-if __name__ == "__main__":
-    resolve()
+
 ```
 
 
@@ -145,75 +140,68 @@ if __name__ == "__main__":
 
 ```python 
 
-def resolve():
-    '''
-    code here
-    '''
-    import copy
-    import collections
-    grid = [[item for item in input()] for _ in range(10)]
+import copy
+import collections
+grid = [[item for item in input()] for _ in range(10)]
 
+is_found = False
+
+for i in range(10):
+    for j in range(10):
+        if grid[i][j] == 'o':
+            start = [i, j]
+            is_found = True
+            break
+    if is_found:
+        break
+
+def dfs(grid, start):
+    stack = collections.deque([start])
     is_found = False
 
+    goto = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+
+    while stack:
+        temp = stack.pop()
+        y, x = temp
+        grid[y][x] = 'x'
+        # print(x,y)
+        # print(grid[y][x])
+
+        for i in range(4):
+            nx = x + goto[i][0]
+            ny = y + goto[i][1]
+
+            if 0 <= nx <= 9 and 0 <= ny <= 9:
+                if grid[ny][nx] == 'o':
+                    stack.append([ny, nx])
+                    #.pop()中身が[y,x]だからここも揃える
+                    grid[ny][nx] = 'x'
+                    # print('next', nx, ny)
+    
     for i in range(10):
         for j in range(10):
-            if grid[i][j] == 'o':
-                start = [i, j]
-                is_found = True
-                break
-        if is_found:
+            if grid[i][j] != 'x':
+                # print(grid[i][j])
+                return False
+    return True
+
+is_slove = False
+
+for i in range(10):
+    for j in range(10):
+        temp_grid = copy.deepcopy(grid)
+        temp_grid[i][j] = 'o'
+        # print(j, i)
+        if dfs(temp_grid, start):
+            # print(j,i)
+            is_slove = True
             break
+    if is_slove:
+        break
 
-    def dfs(grid, start):
-        stack = collections.deque([start])
-        is_found = False
+print('YES') if is_slove else print('NO')
 
-        goto = [[1, 0], [0, 1], [-1, 0], [0, -1]]
-
-        while stack:
-            temp = stack.pop()
-            y, x = temp
-            grid[y][x] = 'x'
-            # print(x,y)
-            # print(grid[y][x])
-
-            for i in range(4):
-                nx = x + goto[i][0]
-                ny = y + goto[i][1]
-
-                if 0 <= nx <= 9 and 0 <= ny <= 9:
-                    if grid[ny][nx] == 'o':
-                        stack.append([ny, nx])
-                        #.pop()中身が[y,x]だからここも揃える
-                        grid[ny][nx] = 'x'
-                        # print('next', nx, ny)
-        
-        for i in range(10):
-            for j in range(10):
-                if grid[i][j] != 'x':
-                    # print(grid[i][j])
-                    return False
-        return True
-
-    is_slove = False
-
-    for i in range(10):
-        for j in range(10):
-            temp_grid = copy.deepcopy(grid)
-            temp_grid[i][j] = 'o'
-            # print(j, i)
-            if dfs(temp_grid, start):
-                # print(j,i)
-                is_slove = True
-                break
-        if is_slove:
-            break
-
-    print('YES') if is_slove else print('NO')
-
-
-if __name__ == "__main__":
-    resolve()
 
 ```
 
@@ -236,53 +224,46 @@ if __name__ == "__main__":
 
 ```python
 
-def resolve():
-    '''
-    code here
-    '''
-    import collections
+import collections
 
-    N, M = [int(item) for item in input().split()]
-    path_list = [[int(item) for item in input().split()] for _ in range(M)]
+N, M = [int(item) for item in input().split()]
+path_list = [[int(item) for item in input().split()] for _ in range(M)]
 
-    edges = [[] for _ in range(N+1)]
+edges = [[] for _ in range(N+1)]
 
-    for a, b in path_list:
-        edges[a].append(b)
-        edges[b].append(a)
+for a, b in path_list:
+    edges[a].append(b)
+    edges[b].append(a)
 
-    stack = collections.deque()
-    fp = [0 for _ in range(N+1)]
+stack = collections.deque()
+fp = [0 for _ in range(N+1)]
 
-    def dfs(start):
-        prev = -1
-        stack.append([start, prev])
+def dfs(start):
+    prev = -1
+    stack.append([start, prev])
 
-        is_roop = False
-        while stack:
-            temp_node, prev = stack.pop()
-            next_edges = edges[temp_node]
-            fp[temp_node] = 1
+    is_roop = False
+    while stack:
+        temp_node, prev = stack.pop()
+        next_edges = edges[temp_node]
+        fp[temp_node] = 1
 
-            if next_edges != []:
-                for next_node in next_edges:
-                    if next_node != prev:
-                        if fp[next_node] == 1:
-                            is_roop = True
-                        else:
-                            stack.append([next_node, temp_node])
+        if next_edges != []:
+            for next_node in next_edges:
+                if next_node != prev:
+                    if fp[next_node] == 1:
+                        is_roop = True
+                    else:
+                        stack.append([next_node, temp_node])
 
-        return False if is_roop else True
+    return False if is_roop else True
 
-    cnt = 0
-    for i in range(1,N+1):
-        if fp[i] == 0:
-            if dfs(i):
-                cnt += 1
-    print(cnt)
-
-if __name__ == "__main__":
-    resolve()
+cnt = 0
+for i in range(1,N+1):
+    if fp[i] == 0:
+        if dfs(i):
+            cnt += 1
+print(cnt)
 
 ```
 
@@ -290,6 +271,42 @@ if __name__ == "__main__":
 
 ### BFSの典型コード
 
+```python
+
+import collections
+H, W = [int(item) for item in input().split()]
+grid = [[item for item in input()] for _ in range(H)]
+
+fp = [[-1 for _ in range(W)] for _ in range(H)]
+
+# position[y, x]
+# start [0,0]
+# goal [H-1, W-1]
+
+que = collections.deque([[0, 0, 1]])
+fp[0][0] = 1
+next_y_x = [[0, 1], [1, 0], [-1, 0], [0, -1]]
+is_found = False
+
+while que:
+    temp = que.popleft()
+
+    if temp[0] == H-1 and temp[1] == W-1:
+        pass_num = temp[2]
+        que = False
+        is_found = True
+    else:
+        for dy, dx in next_y_x:
+            ny = temp[0] + dy
+            nx = temp[1] + dx
+
+            if 0 <= ny <= H-1 and 0 <= nx <= W-1:
+                if grid[ny][nx] == '.' and fp[ny][nx] == -1:
+                    que.append([ny, nx, temp[2]+1])
+                    fp[ny][nx] = temp[2] + 1
+
+print(pass_num) if is_found else print(-1)
+```
 
 ### [ABC007 幅優先探索](https://atcoder.jp/contests/abc007/)
 
@@ -321,65 +338,118 @@ if __name__ == "__main__":
  * 工夫はない
 
 ```python
-def resolve():
-    '''
-    code here
-    '''
-    import collections
-    H, W , N = [int(item) for item in input().split()]
-    grid = [[item for item in input()] for _ in range(H)]
 
-    def find_pos(S):
-        is_found = False
-        for i in range(H):
-            for j in range(W):
-                if S == 0:
-                    if grid[i][j] == 'S':
-                        sy = i
-                        sx = j
-                        is_found = True
-                        return sy, sx
-                else:
-                    if grid[i][j] == str(S):
-                        sy = i
-                        sx = j
-                        is_found = True
-                        return sy, sx
+import collections
+H, W , N = [int(item) for item in input().split()]
+grid = [[item for item in input()] for _ in range(H)]
 
-
-    def path_num(start, goal):
-        sy, sx = find_pos(start)
-        gy, gx = find_pos(goal)
-        que = collections.deque([[sy, sx, 0]])
-        fp = [[-1 for _ in range(W)] for _ in range(H)]
-        d_y_x_list = [[1, 0], [0, 1], [-1, 0,], [0, -1]]
-
-        while que:
-            y, x, cnt = que.popleft()
-
-            if y == gy and x == gx:
-                return cnt
-
+def find_pos(S):
+    is_found = False
+    for i in range(H):
+        for j in range(W):
+            if S == 0:
+                if grid[i][j] == 'S':
+                    sy = i
+                    sx = j
+                    is_found = True
+                    return sy, sx
             else:
-                for dy, dx in d_y_x_list:
-                    ny = y + dy
-                    nx = x + dx
-
-                    if 0 <= ny <= H-1 and 0 <= nx <= W-1:
-                        if grid[ny][nx] != "X" and fp[ny][nx] == -1:
-                            que.append([ny, nx, cnt + 1])
-                            fp[ny][nx] = cnt + 1
-                            # print(ny, nx, cnt + 1)
-        
-
-    res = 0
-    for num in range(N):
-        res += path_num(num, num+1)
-
-    print(res)
+                if grid[i][j] == str(S):
+                    sy = i
+                    sx = j
+                    is_found = True
+                    return sy, sx
 
 
-if __name__ == "__main__":
-    resolve()
+def path_num(start, goal):
+    sy, sx = find_pos(start)
+    gy, gx = find_pos(goal)
+    que = collections.deque([[sy, sx, 0]])
+    fp = [[-1 for _ in range(W)] for _ in range(H)]
+    d_y_x_list = [[1, 0], [0, 1], [-1, 0,], [0, -1]]
+
+    while que:
+        y, x, cnt = que.popleft()
+
+        if y == gy and x == gx:
+            return cnt
+
+        else:
+            for dy, dx in d_y_x_list:
+                ny = y + dy
+                nx = x + dx
+
+                if 0 <= ny <= H-1 and 0 <= nx <= W-1:
+                    if grid[ny][nx] != "X" and fp[ny][nx] == -1:
+                        que.append([ny, nx, cnt + 1])
+                        fp[ny][nx] = cnt + 1
+                        # print(ny, nx, cnt + 1)
+    
+
+res = 0
+for num in range(N):
+    res += path_num(num, num+1)
+
+print(res)
+
+```
+
+
+### [ABC088D - Grid Repainting](https://atcoder.jp/contests/abc088/tasks/abc088_d)
+
+#### 方針
+
+* 黒く塗っても最短経路でゴールできる場合が解になる
+* ゴールした経路を求めて、それ以外を黒塗ればいい
+    * 問われているのは個数だから正確なルート座標は分からなくてもいい
+    * 最短経路の手数さえわかればよい
+* もともと黒い所は色が変えられないのだから点数にならない
+* よって解は「全マス数　-　最短経路の手数　-　もともと黒の個数」となる
+
+#### 実装
+
+* 普通にBFSで最短経路の手数求めただけ
+* 答えが見つからない場合もあるので、ゴールが見つかったときに`is_found　= True`にする。
+
+```python
+
+import collections
+H, W = [int(item) for item in input().split()]
+grid = [[item for item in input()] for _ in range(H)]
+
+fp = [[-1 for _ in range(W)] for _ in range(H)]
+
+que = collections.deque([[0, 0, 1]])
+fp[0][0] = 1
+next_y_x = [[0, 1], [1, 0], [-1, 0], [0, -1]]
+is_found = False
+
+while que:
+    temp = que.popleft()
+
+    if temp[0] == H-1 and temp[1] == W-1:
+        pass_num = temp[2]
+        que = False
+        is_found = True
+    else:
+        for dy, dx in next_y_x:
+            ny = temp[0] + dy
+            nx = temp[1] + dx
+
+            if 0 <= ny <= H-1 and 0 <= nx <= W-1:
+                if grid[ny][nx] == '.' and fp[ny][nx] == -1:
+                    que.append([ny, nx, temp[2]+1])
+                    fp[ny][nx] = temp[2] + 1
+
+black_cnt = 0
+for i in range(H):
+    for j in range(W):
+        if grid[i][j] == '#':
+            black_cnt += 1
+
+if is_found:
+    print(H*W - black_cnt - pass_num)
+else:
+    print(-1)
 
 ```
