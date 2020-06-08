@@ -1,12 +1,6 @@
 def resolve():
     '''
     code here
-
-    01BFSの手法を使う必要がある
-    優先度高いを先頭にpush
-    優先度低いを後ろにpush
-    先頭からpopleft
-
     '''
 
     import collections
@@ -14,10 +8,6 @@ def resolve():
     grid = [[item for item in input()] for _ in range(H)]
 
     fp = [[-1 for _ in range(W)] for _ in range(H)]
-
-    # position[y, x]
-    # start [0,0]
-    # goal [H-1, W-1]
 
     for i in range(H):
         for j in range(W):
@@ -43,18 +33,20 @@ def resolve():
                 ny = temp[0] + dy
                 nx = temp[1] + dx
 
-                if 0 <= ny <= H-1 and 0 <= nx <= W-1:
+                if 0 <= ny <= H-1 and 0 <= nx <= W-1 and fp[ny][nx] == -1:
                     if grid[ny][nx] == '#': 
                         if temp[2] < 2:
                             que.append([ny, nx, temp[2]+1])
                             fp[ny][nx] = temp[2]+1
                     else:
-                        que.append([ny, nx, temp[2]])
+                        que.appendleft([ny, nx, temp[2]])
                         fp[ny][nx] = temp[2]
 
 
     print('YES') if is_found else print('NO')
-    print(fp)
 
-    if __name__ == "__main__":
-        resolve()
+
+if __name__ == "__main__":
+    resolve()
+
+

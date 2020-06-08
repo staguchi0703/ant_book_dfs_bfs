@@ -11,7 +11,7 @@
 ### DFS典型コード
 
 
-* numpy.whereとか使いたくなるが、激重なので使用NG
+* numpy.whereとか使いたくなるが、激重なのでNG
 * collection.queとlistのスライスで攻めるのが◎
 
 ```python
@@ -321,10 +321,10 @@ print(pass_num) if is_found else print(-1)
   * -1で初期化
   * 開始地点を0で初期化
   * que追加の際に足跡を記録
-* 行先を`d_y_x_list`として登録することで、他の方向で動いても対応可
-* 入れる値受ける値を配列のスライス順に合わせてy,xの順序で処理してた
+* 行先を`d_y_x_list`として問題に応じて登録することで、上下左右以外の方向で動いても対応可
+* 入れる値受ける値を配列のスライス順に合わせてy,xの順序で処理した
 * 次の番手目が分かるようにqueに次の番手目を加えた
-* 次の番手目が枠をはみ出しているか判定するために、`ny, nx`を計算し、if文で絞り込みをかけた 
+* 次の番手目が枠をはみ出しているか判定するために、`ny, nx`を計算しif文でフィルタした 
 
 
 ### [JOI2010 E](https://atcoder.jp/contests/joi2011yo/tasks/joi2011yo_e)
@@ -468,3 +468,113 @@ else:
 
 * pythonだとTLEした
 * pypy3でクリア
+
+
+```python
+import collections
+H, W = [int(item) for item in input().split()]
+grid = [[item for item in input()] for _ in range(H)]
+
+fp = [[-1 for _ in range(W)] for _ in range(H)]
+
+que = collections.deque()
+next_y_x = [[0, 1], [1, 0], [-1, 0], [0, -1]]
+
+
+for i in range(H):
+    for j in range(W):
+        if grid[i][j] == '#':
+            que.append([i, j, 0])
+            fp[i][j] = 0
+
+while que:
+    temp = que.popleft()
+
+    for dy, dx in next_y_x:
+        ny = temp[0] + dy
+        nx = temp[1] + dx
+
+        if 0 <= ny <= H-1 and 0 <= nx <= W-1:
+            if fp[ny][nx] == -1:
+                que.append([ny, nx, temp[2]+1])
+                fp[ny][nx] = temp[2] + 1
+
+temp_max_list = []
+for line in fp:
+    temp_max_list.append(max(line))
+
+print(max(temp_max_list))
+```
+
+
+### [ARC005C - 器物損壊！高橋君](https://atcoder.jp/contests/arc005/tasks/arc005_3)
+
+#### 方針
+
+* 壁がないところはコスト0で行く
+* 壁があるところは通過にコスト1で行く
+* ゴールにたどり着くまでに使えるコストは2までに制限する
+* 同じ場所に異なるコストでたどり着く場合があるので、低コストたどり着く方を優先する
+* BFSで一度通った所もコストが異なれば再度通っても良いとすると、永遠にqueが消えないので工夫が必要
+* よって、同コストでたどり着ける範囲を調べて、そこからコスト+1で辿りつける座標を見つける事とする
+  * コストが増加しない座標を全て調べる
+  * 訪問済みの座標は評価しない
+  * コストが増加しないが表を調べ終わってから壁を通過してコストを１増やす
+
+* 上記工夫は[01BFS](https://betrue12.hateblo.jp/entry/2018/12/08/000020)という手法
+  * BFSと銘打っているが、DFSとBFSを条件で分けて使っている
+  * queとstackのデータ構造を巧く利用する考え方
+  * 上記記事によると01BFSの**BFS**は幅優先探索でなく、「最良優先探索(Best-First Search)」という言葉が適していると指摘している。
+
+#### 実装
+
+* 01BFSのデータの持ち方が味噌
+  * dequeで次座標のデータを持つ
+  * BFSの拡張と考えて、`popleft()`でデータを取り出す
+  * コストが変わらない座標を優先探索するので、上記dequeに`appendleft()`する
+* 上記のように走査することで全ての座標に最低コストでアクセスすることになるので、一度訪れた座標は評価しなくても良い
+
+
+```python
+import collections
+H, W = [int(item) for item in input().split()]
+grid = [[item for item in input()] for _ in range(H)]
+
+fp = [[-1 for _ in range(W)] for _ in range(H)]
+
+for i in range(H):
+    for j in range(W):
+        if grid[i][j] == 's':
+            start = [i, j]
+        if grid[i][j] == 'g':
+            goal = [i, j]
+
+
+que = collections.deque([[start[0], start[1], 0]])
+fp[start[0]][start[1]] = 0
+next_y_x = [[0, 1], [1, 0], [-1, 0], [0, -1]]
+is_found = False
+
+while que:
+    temp = que.popleft()
+
+    if temp[0] == goal[0] and temp[1] == goal[1]:
+        que = False
+        is_found = True
+    else:
+        for dy, dx in next_y_x:
+            ny = temp[0] + dy
+            nx = temp[1] + dx
+
+            if 0 <= ny <= H-1 and 0 <= nx <= W-1 and fp[ny][nx] == -1:
+                if grid[ny][nx] == '#':
+                    if temp[2] < 2:
+                        que.append([ny, nx, temp[2]+1])
+                        fp[ny][nx] = temp[2]+1
+                else:
+                    que.appendleft([ny, nx, temp[2]])
+                    fp[ny][nx] = temp[2]
+
+
+print('YES') if is_found else print('NO')
+```

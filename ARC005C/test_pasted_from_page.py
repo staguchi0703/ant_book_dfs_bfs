@@ -17,9 +17,6 @@ class TestClass(unittest.TestCase):
         sys.stdout.seek(0)
         out = sys.stdout.read()[:-1]
         sys.stdout, sys.stdin = stdout, stdin
-        print('------------')
-        print(out)
-        print('------------')
         self.assertEqual(out, output)
 
     def test_入力例_1(self):
@@ -61,9 +58,9 @@ g##.#.#.#.
 ###...
 ###...
 ######
-..####
+...###
 g.####"""
-        output = """NO"""
+        output = """YES"""
         self.assertIO(input, output)
 
     def test_入力例_5(self):
