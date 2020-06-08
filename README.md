@@ -2,9 +2,8 @@
 
 ## 参考
 
-* `https://qiita.com/drken/items/e77685614f3c6bf86f44`
-
-* 上記に示される例題を解いた
+* [AtCoder 版！蟻本 (初級編)](https://qiita.com/drken/items/e77685614f3c6bf86f44)に示されるDFSとBFSの類題を解いた
+* [この解説をqiitaにupした](https://qiita.com/tagtagtag/items/5886baa801ead5637d58)
 
 ## DFS
 
